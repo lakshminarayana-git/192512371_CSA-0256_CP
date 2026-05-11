@@ -1,363 +1,197 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include<stdio.h>
+#include<string.h>
 
 struct Product
 {
     int id;
-    char name[50];
+    char name[20];
     int quantity;
     float price;
 };
 
-void addProduct();
-void viewProducts();
-void searchProduct();
-void updateProduct();
-void generateBill();
-void deleteProduct();
-void checkStock();
-void lowStockAlert();
-
 int main()
 {
-    int choice;
+    struct Product p[10];
+    int n = 0, i, choice, searchId;
+    float total;
 
-    while (1)
+    printf("===== INVENTORY MANAGEMENT SYSTEM =====\n");
+
+    while(1)
     {
-        printf("\n===== PRODUCT MANAGEMENT =====");
-        printf("\n1. Add Product");
-        printf("\n2. View Products");
+        printf("\n\n===== MENU =====");
+        printf("\n1. Add Products");
+        printf("\n2. Display Products");
         printf("\n3. Search Product");
         printf("\n4. Update Product");
         printf("\n5. Delete Product");
-        printf("\n6. Generate Bill");
-        printf("\n7. Check Stock");
-        printf("\n8. Low Stock Alert");
-        printf("\n9. Exit");
+        printf("\n6. Billing");
+        printf("\n7. Exit");
 
         printf("\nEnter Choice: ");
         scanf("%d", &choice);
 
-        switch (choice)
+        switch(choice)
         {
-        case 1:
-            addProduct();
-            break;
+            // ADD PRODUCTS
+            case 1:
 
-        case 2:
-            viewProducts();
-            break;
+                printf("\nHow Many Products to Add: ");
+                scanf("%d", &n);
 
-        case 3:
-            searchProduct();
-            break;
+                for(i=0; i<n; i++)
+                {
+                    printf("\nEnter Product %d Details\n", i+1);
 
-        case 4:
-            updateProduct();
-            break;
+                    printf("Product ID: ");
+                    scanf("%d", &p[i].id);
 
-        case 5:
-            deleteProduct();
-            break;
-            
-         case 6:
-            generateBill();
-            break;
+                    printf("Product Name: ");
+                    scanf("%s", p[i].name);
 
-        case 7:
-            checkStock();
-            break;
+                    printf("Quantity: ");
+                    scanf("%d", &p[i].quantity);
 
-        case 8:
-            lowStockAlert();
-            break;
+                    printf("Price: ");
+                    scanf("%f", &p[i].price);
+                }
 
-        case 9:
-            exit(0);
+                printf("\nProducts Added Successfully!");
+                break;
 
-        default:
-            printf("\nInvalid Choice!\n");
+            // DISPLAY PRODUCTS
+            case 2:
+
+                printf("\nID\t  NAME\tQTY\tPRICE\n");
+
+                for(i=0; i<n; i++)
+                {
+                    printf("%d\t%s\t%d\t%.2f\n",
+                           p[i].id,
+                           p[i].name,
+                           p[i].quantity,
+                           p[i].price);
+                }
+
+                break;
+
+            // SEARCH PRODUCT
+            case 3:
+
+                printf("\nEnter Product ID to Search: ");
+                scanf("%d", &searchId);
+
+                for(i=0; i<n; i++)
+                {
+                    if(p[i].id == searchId)
+                    {
+                        printf("\nProduct Found");
+                        printf("\nName: %s", p[i].name);
+                        printf("\nQuantity: %d", p[i].quantity);
+                        printf("\nPrice: %.2f\n", p[i].price);
+                    }
+                }
+
+                break;
+
+            // UPDATE PRODUCT
+            case 4:
+
+                printf("\nEnter Product ID to Update: ");
+                scanf("%d", &searchId);
+
+                for(i=0; i<n; i++)
+                {
+                    if(p[i].id == searchId)
+                    {
+                        printf("\nEnter New Product Name: ");
+                        scanf("%s", p[i].name);
+
+                        printf("Enter New Quantity: ");
+                        scanf("%d", &p[i].quantity);
+
+                        printf("Enter New Price: ");
+                        scanf("%f", &p[i].price);
+
+                        printf("\nProduct Updated Successfully!");
+                    }
+                }
+
+                break;
+
+            // DELETE PRODUCT
+            case 5:
+
+                printf("\nEnter Product ID to Delete: ");
+                scanf("%d", &searchId);
+
+                for(i=0; i<n; i++)
+                {
+                    if(p[i].id == searchId)
+                    {
+                        int j;
+
+                        for(j=i; j<n-1; j++)
+                        {
+                            p[j] = p[j+1];
+                        }
+
+                        n--;
+
+                        printf("\nProduct Deleted Successfully!");
+                        break;
+                    }
+                }
+
+                break;
+
+            // BILLING
+            case 6:
+
+                printf("\nEnter Product ID: ");
+                scanf("%d", &searchId);
+
+                for(i=0; i<n; i++)
+                {
+                    if(p[i].id == searchId)
+                    {
+                        int qty;
+
+                        printf("Enter Quantity: ");
+                        scanf("%d", &qty);
+
+                        if(qty <= p[i].quantity)
+                        {
+                            total = qty * p[i].price;
+
+                            p[i].quantity = p[i].quantity - qty;
+
+                            printf("\n===== BILL =====");
+                            printf("\nProduct: %s", p[i].name);
+                            printf("\nPrice: %.2f", p[i].price);
+                            printf("\nQuantity: %d", qty);
+                            printf("\nTotal Amount: %.2f\n", total);
+                        }
+                        else
+                        {
+                            printf("\nInsufficient Stock!");
+                        }
+                    }
+                }
+
+                break;
+
+            // EXIT
+            case 7:
+
+                printf("\nProgram Ended");
+                return 0;
+
+            default:
+
+                printf("\nInvalid Choice");
         }
     }
 
     return 0;
-}
-
-void addProduct()
-{
-    FILE *fp;
-    struct Product p;
-
-    fp = fopen("products.txt", "ab");
-
-    printf("\nEnter Product ID: ");
-    scanf("%d", &p.id);
-
-    printf("Enter Product Name: ");
-    scanf("%s", p.name);
-
-    printf("Enter Quantity: ");
-    scanf("%d", &p.quantity);
-
-    printf("Enter Price: ");
-    scanf("%f", &p.price);
-
-    fwrite(&p, sizeof(p), 1, fp);
-
-    fclose(fp);
-
-    printf("\nProduct Added Successfully!\n");
-}
-
-void viewProducts()
-{
-    FILE *fp;
-    struct Product p;
-
-    fp = fopen("products.txt", "rb");
-
-    if (fp == NULL)
-    {
-        printf("\nNo Records Found!\n");
-        return;
-    }
-
-    printf("\n================================");
-    printf("\nID\tName\tQty\tPrice");
-    printf("\n================================\n");
-
-    while (fread(&p, sizeof(p), 1, fp))
-    {
-        printf("%d\t%s\t%d\t%.2f\n",
-               p.id, p.name, p.quantity, p.price);
-    }
-
-    fclose(fp);
-}
-
-void searchProduct()
-{
-    FILE *fp;
-    struct Product p;
-    int id, found = 0;
-
-    fp = fopen("products.txt", "rb");
-
-    printf("\nEnter Product ID to Search: ");
-    scanf("%d", &id);
-
-    while (fread(&p, sizeof(p), 1, fp))
-    {
-        if (p.id == id)
-        {
-            printf("\nProduct Found!");
-            printf("\nID: %d", p.id);
-            printf("\nName: %s", p.name);
-            printf("\nQuantity: %d", p.quantity);
-            printf("\nPrice: %.2f\n", p.price);
-
-            found = 1;
-            break;
-        }
-    }
-
-    if (!found)
-    {
-        printf("\nProduct Not Found!\n");
-    }
-
-    fclose(fp);
-}
-
-void updateProduct()
-{
-    FILE *fp, *temp;
-    struct Product p;
-
-    int id, found = 0;
-
-    fp = fopen("products.txt", "rb");
-    temp = fopen("temp.txt", "wb");
-
-    printf("\nEnter Product ID to Update: ");
-    scanf("%d", &id);
-
-    while (fread(&p, sizeof(p), 1, fp))
-    {
-        if (p.id == id)
-        {
-            printf("Enter New Quantity: ");
-            scanf("%d", &p.quantity);
-
-            printf("Enter New Price: ");
-            scanf("%f", &p.price);
-
-            found = 1;
-        }
-
-        fwrite(&p, sizeof(p), 1, temp);
-    }
-
-    fclose(fp);
-    fclose(temp);
-
-    remove("products.txt");
-    rename("temp.txt", "products.txt");
-
-    if (found)
-        printf("\nProduct Updated Successfully!\n");
-    else
-        printf("\nProduct Not Found!\n");
-}
-
-void deleteProduct()
-{
-    FILE *fp, *temp;
-    struct Product p;
-
-    int id, found = 0;
-
-    fp = fopen("products.txt", "rb");
-    temp = fopen("temp.txt", "wb");
-
-    printf("\nEnter Product ID to Delete: ");
-    scanf("%d", &id);
-
-    while (fread(&p, sizeof(p), 1, fp))
-    {
-        if (p.id == id)
-        {
-            found = 1;
-            continue;
-        }
-
-        fwrite(&p, sizeof(p), 1, temp);
-    }
-
-    fclose(fp);
-    fclose(temp);
-
-    remove("products.txt");
-    rename("temp.txt", "products.txt");
-
-    if (found)
-        printf("\nProduct Deleted Successfully!\n");
-    else
-        printf("\nProduct Not Found!\n");
-        
-}
-
-void generateBill()
-{
-    FILE *fp;
-    FILE *temp;
-
-    struct Product p;
-
-    int id, qty, found = 0;
-    float total;
-
-    fp = fopen("products.txt", "rb");
-    temp = fopen("temp.txt", "wb");
-
-    printf("\nEnter Product ID: ");
-    scanf("%d", &id);
-
-    printf("Enter Purchase Quantity: ");
-    scanf("%d", &qty);
-
-    while (fread(&p, sizeof(p), 1, fp))
-    {
-        if (p.id == id)
-        {
-            found = 1;
-
-            if (p.quantity >= qty)
-            {
-                total = qty * p.price;
-
-                p.quantity -= qty;
-
-                printf("\n========== BILL ==========");
-                printf("\nProduct Name : %s", p.name);
-                printf("\nPrice        : %.2f", p.price);
-                printf("\nQuantity     : %d", qty);
-                printf("\nTotal Amount : %.2f", total);
-                printf("\n==========================\n");
-            }
-            else
-            {
-                printf("\nInsufficient Stock!\n");
-            }
-        }
-
-        fwrite(&p, sizeof(p), 1, temp);
-    }
-
-    fclose(fp);
-    fclose(temp);
-
-    remove("products.txt");
-    rename("temp.txt", "products.txt");
-
-    if (!found)
-    {
-        printf("\nProduct Not Found!\n");
-    }
-}
-
-void checkStock()
-{
-    FILE *fp;
-    struct Product p;
-
-    fp = fopen("products.txt", "rb");
-
-    if (fp == NULL)
-    {
-        printf("\nNo Product Records Found!\n");
-        return;
-    }
-
-    printf("\n========= STOCK DETAILS =========");
-    printf("\nID\tName\tQuantity");
-    printf("\n=================================\n");
-
-    while (fread(&p, sizeof(p), 1, fp))
-    {
-        printf("%d\t%s\t%d\n",
-               p.id, p.name, p.quantity);
-    }
-
-    fclose(fp);
-}
-
-void lowStockAlert()
-{
-    FILE *fp;
-    struct Product p;
-
-    fp = fopen("products.txt", "rb");
-
-    if (fp == NULL)
-    {
-        printf("\nNo Product Records Found!\n");
-        return;
-    }
-
-    printf("\n====== LOW STOCK PRODUCTS ======\n");
-
-    while (fread(&p, sizeof(p), 1, fp))
-    {
-        if (p.quantity < 5)
-        {
-            printf("Product ID   : %d\n", p.id);
-            printf("Product Name : %s\n", p.name);
-            printf("Quantity     : %d\n", p.quantity);
-            printf("-----------------------------\n");
-        }
-    }
-
-    fclose(fp);
 }
