@@ -14,8 +14,10 @@ void addProduct();
 void viewProducts();
 void searchProduct();
 void updateProduct();
-void deleteProduct();
 void generateBill();
+void deleteProduct();
+void checkStock();
+void lowStockAlert();
 
 int main()
 {
@@ -23,17 +25,18 @@ int main()
 
     while (1)
     {
-        printf("\n=====================================");
-        printf("\n INVENTORY MANAGEMENT SYSTEM");
-        printf("\n=====================================");
+        printf("\n===== PRODUCT MANAGEMENT =====");
         printf("\n1. Add Product");
         printf("\n2. View Products");
         printf("\n3. Search Product");
         printf("\n4. Update Product");
         printf("\n5. Delete Product");
         printf("\n6. Generate Bill");
-        printf("\n7. Exit");
-        printf("\nEnter your choice: ");
+        printf("\n7. Check Stock");
+        printf("\n8. Low Stock Alert");
+        printf("\n9. Exit");
+
+        printf("\nEnter Choice: ");
         scanf("%d", &choice);
 
         switch (choice)
@@ -57,13 +60,20 @@ int main()
         case 5:
             deleteProduct();
             break;
-
-        case 6:
+            
+         case 6:
             generateBill();
             break;
 
         case 7:
-            printf("\nExiting Program...\n");
+            checkStock();
+            break;
+
+        case 8:
+            lowStockAlert();
+            break;
+
+        case 9:
             exit(0);
 
         default:
@@ -109,13 +119,13 @@ void viewProducts()
 
     if (fp == NULL)
     {
-        printf("\nNo Products Found!\n");
+        printf("\nNo Records Found!\n");
         return;
     }
 
-    printf("\n========================================");
+    printf("\n================================");
     printf("\nID\tName\tQty\tPrice");
-    printf("\n========================================\n");
+    printf("\n================================\n");
 
     while (fread(&p, sizeof(p), 1, fp))
     {
@@ -162,10 +172,9 @@ void searchProduct()
 
 void updateProduct()
 {
-    FILE *fp;
-    FILE *temp;
-
+    FILE *fp, *temp;
     struct Product p;
+
     int id, found = 0;
 
     fp = fopen("products.txt", "rb");
@@ -178,7 +187,7 @@ void updateProduct()
     {
         if (p.id == id)
         {
-            printf("\nEnter New Quantity: ");
+            printf("Enter New Quantity: ");
             scanf("%d", &p.quantity);
 
             printf("Enter New Price: ");
@@ -204,10 +213,9 @@ void updateProduct()
 
 void deleteProduct()
 {
-    FILE *fp;
-    FILE *temp;
-
+    FILE *fp, *temp;
     struct Product p;
+
     int id, found = 0;
 
     fp = fopen("products.txt", "rb");
@@ -237,6 +245,7 @@ void deleteProduct()
         printf("\nProduct Deleted Successfully!\n");
     else
         printf("\nProduct Not Found!\n");
+        
 }
 
 void generateBill()
@@ -296,4 +305,59 @@ void generateBill()
     {
         printf("\nProduct Not Found!\n");
     }
+}
+
+void checkStock()
+{
+    FILE *fp;
+    struct Product p;
+
+    fp = fopen("products.txt", "rb");
+
+    if (fp == NULL)
+    {
+        printf("\nNo Product Records Found!\n");
+        return;
+    }
+
+    printf("\n========= STOCK DETAILS =========");
+    printf("\nID\tName\tQuantity");
+    printf("\n=================================\n");
+
+    while (fread(&p, sizeof(p), 1, fp))
+    {
+        printf("%d\t%s\t%d\n",
+               p.id, p.name, p.quantity);
+    }
+
+    fclose(fp);
+}
+
+void lowStockAlert()
+{
+    FILE *fp;
+    struct Product p;
+
+    fp = fopen("products.txt", "rb");
+
+    if (fp == NULL)
+    {
+        printf("\nNo Product Records Found!\n");
+        return;
+    }
+
+    printf("\n====== LOW STOCK PRODUCTS ======\n");
+
+    while (fread(&p, sizeof(p), 1, fp))
+    {
+        if (p.quantity < 5)
+        {
+            printf("Product ID   : %d\n", p.id);
+            printf("Product Name : %s\n", p.name);
+            printf("Quantity     : %d\n", p.quantity);
+            printf("-----------------------------\n");
+        }
+    }
+
+    fclose(fp);
 }
